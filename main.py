@@ -6,6 +6,12 @@ from PySide6.QtCore import Qt, Signal
 import sys
 import math
 
+# TODO: @jacob feel free de añadir una primera coordenada con valores 0/1 si es necesario, de momento he tratado todo como puntos en R2 sin más
+class Punto:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
 class Coordenadas:
     def __init__(self, max_points=4):
         self.max_points = max_points
@@ -13,18 +19,30 @@ class Coordenadas:
 
     def add_point(self, x, y):
         if len(self.points) < self.max_points:
-            self.points.append((x, y))
+            self.points.append(Punto(x, y))
+            self.order_points()
             return True
         return False
 
     def remove_point_near(self, x, y, threshold=20):
         """Elimina un punto cercano a las coordenadas dadas"""
-        for i, (px, py) in enumerate(self.points):
-            distance = math.sqrt((px - x) ** 2 + (py - y) ** 2)
+        for i, p in enumerate(self.points):
+            distance = math.sqrt((p.x - x) ** 2 + (p.y - y) ** 2)
             if distance < threshold:
                 self.points.pop(i)
                 return True
         return False
+
+    # Ordena los puntos en sentido horario comenzando por la esquina top izquierda
+    def order_points(self):
+        cx = sum(p.x for p in self.points) / len(self.points)
+        cy = sum(p.y for p in self.points) / len(self.points)
+
+        # TODO: Comprobar que el orden está bien calculado
+        self.points = sorted(self.points, key=lambda p: (
+            -1 if p.y <= cy else 1,  # Primero separar arriba/abajo
+            -p.x if p.x <= cx else p.x  # Luego izquierda/derecha
+        ))
 
     def clear(self):
         self.points = []
@@ -86,13 +104,16 @@ class ClickArea(QFrame):
             painter.drawPixmap(0, 0, self.image)
 
         if self.coordenadas.points:
-            pen = QPen(Qt.red)
-            pen.setWidth(8)
-            painter.setPen(pen)
 
+            # El cambio de color está para debuggear el orden de los puntos. Se puede cambiar de vuelta a siempre rojo una vez sepamos que va bien
+            # COLORS
+            colors = [Qt.GlobalColor.red, Qt.GlobalColor.green, Qt.GlobalColor.blue, Qt.GlobalColor.yellow]
             # Dibujar puntos
-            for point in self.coordenadas.points:
-                painter.drawPoint(int(point[0]), int(point[1]))
+            for i, point in enumerate(self.coordenadas.points):
+                pen = QPen(colors[i])
+                pen.setWidth(8)
+                painter.setPen(pen)
+                painter.drawPoint(int(point.x), int(point.y))
 
 class ClickCaptureWidget(QWidget):
     def __init__(self):
@@ -198,7 +219,7 @@ class ClickCaptureWidget(QWidget):
     def accept_points(self):
         if self.click_area.coordenadas.is_complete():
             points = self.click_area.coordenadas.get_points()
-            message = "\n".join([f"Punto {i + 1}: ({x:.1f}, {y:.1f})" for i, (x, y) in enumerate(points)])
+            message = "\n".join([f"Punto {i + 1}: ({p.x:.1f}, {p.y:.1f})" for i, p in enumerate(points)])
             QMessageBox.information(self, "Puntos seleccionados", message)
         else:
             QMessageBox.warning(self, "Error", "Debes seleccionar exactamente 4 puntos")
