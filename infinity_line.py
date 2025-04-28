@@ -1,4 +1,4 @@
-from main import Punto
+from classes import Punto
 
 # TODO: Renombrar este archivo si lo veis necesario (no estaba segura de como llamarlo)
 def calculate_infinity_line(p1: Punto, p2: Punto, p3: Punto, p4: Punto):
@@ -9,10 +9,10 @@ def calculate_infinity_line(p1: Punto, p2: Punto, p3: Punto, p4: Punto):
     return [p, q] # TODO: @Jacob, si necesitas modificar lo que devuelve esta función 0 problema, de momento lo dejo como los 2 puntos de la recta del infinito
 
 def intersection(r1, r2):
-    x1, y1 = r1[0]
-    x2, y2 = r1[1]
-    x3, y3 = r2[0]
-    x4, y4 = r2[1]
+    x1, y1 = r1[0].x, r1[0].y
+    x2, y2 = r1[1].x, r1[1].y
+    x3, y3 = r2[0].x, r2[0].y
+    x4, y4 = r2[1].x, r2[1].y
 
     # Line r1 in the form: a1*x + b1*y = c1
     a1 = y2 - y1

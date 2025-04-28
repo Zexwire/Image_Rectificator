@@ -2,57 +2,11 @@ from PySide6.QtWidgets import (
     QApplication, QWidget, QPushButton, QVBoxLayout, QLabel, QMessageBox, QFrame, QFileDialog, QHBoxLayout
 )
 from PySide6.QtGui import QPainter, QPen, QMouseEvent, QPixmap, QFont, QPalette, QIcon
-from PySide6.QtCore import Qt, Signal
+from PySide6.QtCore import Qt, Signal, QLineF
 import sys
-import math
 
-# TODO: @jacob feel free de añadir una primera coordenada con valores 0/1 si es necesario, de momento he tratado todo como puntos en R2 sin más
-class Punto:
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-
-class Coordenadas:
-    def __init__(self, max_points=4):
-        self.max_points = max_points
-        self.points = []
-
-    def add_point(self, x, y):
-        if len(self.points) < self.max_points:
-            self.points.append(Punto(x, y))
-            self.order_points()
-            return True
-        return False
-
-    def remove_point_near(self, x, y, threshold=20):
-        """Elimina un punto cercano a las coordenadas dadas"""
-        for i, p in enumerate(self.points):
-            distance = math.sqrt((p.x - x) ** 2 + (p.y - y) ** 2)
-            if distance < threshold:
-                self.points.pop(i)
-                return True
-        return False
-
-    # Ordena los puntos en sentido horario comenzando por la esquina top izquierda
-    def order_points(self):
-        cx = sum(p.x for p in self.points) / len(self.points)
-        cy = sum(p.y for p in self.points) / len(self.points)
-
-        # TODO: Comprobar que el orden está bien calculado
-        self.points = sorted(self.points, key=lambda p: (
-            -1 if p.y <= cy else 1,  # Primero separar arriba/abajo
-            -p.x if p.x <= cx else p.x  # Luego izquierda/derecha
-        ))
-
-    def clear(self):
-        self.points = []
-
-    def is_complete(self):
-        return len(self.points) == self.max_points
-
-    def get_points(self):
-        return self.points.copy()
-
+from infinity_line import calculate_infinity_line
+from classes import *
 
 class ClickArea(QFrame):
     points_changed = Signal()
@@ -64,6 +18,7 @@ class ClickArea(QFrame):
         self.setStyleSheet("background-color: #808080;")
         self.setMinimumSize(800, 800)
         self.point_radius = 10  # Radio para detectar clics en puntos existentes
+        self.infinity_line = None  # DEBUG:  borrar después
 
     def load_image(self, image_path):
         original_image = QPixmap(image_path)
@@ -96,6 +51,11 @@ class ClickArea(QFrame):
                 self.points_changed.emit()
                 self.update()
 
+    # DEBUG: Borrar después
+    def set_infinity_line(self, infinity_line):
+        self.infinity_line = infinity_line
+        self.update()  # Trigger a repaint
+
     def paintEvent(self, event):
         super().paintEvent(event)
         painter = QPainter(self)
@@ -115,6 +75,30 @@ class ClickArea(QFrame):
                 painter.setPen(pen)
                 painter.drawPoint(int(point.x), int(point.y))
 
+        # DEBUG: Para ver si se están calculando bien los puntos intersección. Cuando terminemos con el primer sprint lo borramos
+        if self.infinity_line and len(self.coordenadas.points) >= 4:
+            pen = QPen(Qt.GlobalColor.red)
+            pen.setWidth(3)
+            painter.setPen(pen)
+            points = self.coordenadas.get_points()
+            painter.drawLine(int(points[0].x), int(points[0].y),
+                           int(self.infinity_line[0].x), int(self.infinity_line[0].y))
+            painter.drawLine(int(points[2].x), int(points[2].y),
+                             int(self.infinity_line[0].x), int(self.infinity_line[0].y))
+
+            painter.drawLine(int(points[0].x), int(points[0].y),
+                           int(self.infinity_line[1].x), int(self.infinity_line[1].y))
+            painter.drawLine(int(points[1].x), int(points[1].y),
+                             int(self.infinity_line[1].x), int(self.infinity_line[1].y))
+
+            pen = QPen(Qt.GlobalColor.darkBlue)
+            pen.setWidth(3)
+            painter.setPen(pen)
+            painter.drawLine(int(self.infinity_line[0].x), int(self.infinity_line[0].y),
+                             int(self.infinity_line[1].x), int(self.infinity_line[1].y))
+        
+
+# TODO: @María hacer que el tamaño de la ventana sea adaptable y la imagen se ajuste manteniendo su proporción
 class ClickCaptureWidget(QWidget):
     def __init__(self):
         super().__init__()
@@ -221,10 +205,16 @@ class ClickCaptureWidget(QWidget):
             points = self.click_area.coordenadas.get_points()
             message = "\n".join([f"Punto {i + 1}: ({p.x:.1f}, {p.y:.1f})" for i, p in enumerate(points)])
             QMessageBox.information(self, "Puntos seleccionados", message)
+            self.draw_lines() # DEBUG: Borrar después
         else:
             QMessageBox.warning(self, "Error", "Debes seleccionar exactamente 4 puntos")
 
-
+    # DEBUG: Borrar después
+    def draw_lines(self):
+        points = self.click_area.coordenadas.get_points()
+        infinity_line = calculate_infinity_line(points[0], points[1], points[2], points[3])
+        self.click_area.set_infinity_line(infinity_line)
+        
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = ClickCaptureWidget()
