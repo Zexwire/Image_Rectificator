@@ -1,10 +1,19 @@
 import math
 
-# TODO: @jacob feel free de añadir una primera coordenada con valores 0/1 si es necesario, de momento he tratado todo como puntos en R2 sin más
 class Punto:
     def __init__(self, x, y):
         self.x = x
         self.y = y
+
+class PuntoProyectivo:
+    def __init__(self, inf, x, y):
+        self.inf = inf #0/1 que define si está o no en la recta del infinito
+        self.x = x
+        self.y = y
+
+    @classmethod
+    def proyectar(cls, inf, punto):
+        return cls(inf, punto.x, punto.y)
 
 class Coordenadas:
     def __init__(self, max_points=4):
