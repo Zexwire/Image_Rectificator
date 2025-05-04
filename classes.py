@@ -4,6 +4,8 @@ class Punto:
     def __init__(self, x, y):
         self.x = x
         self.y = y
+    def to_tuple(self):
+        return (self.x, self.y)
 
 class PuntoProyectivo:
     def __init__(self, inf, x, y):
@@ -36,15 +38,18 @@ class Coordenadas:
                 return True
         return False
 
-    # Ordena los puntos en sentido horario comenzando por la esquina top izquierda
     def order_points(self):
-        cx = sum(p.x for p in self.points) / len(self.points)
-        cy = sum(p.y for p in self.points) / len(self.points)
+        if len(self.points) != 4:
+            return
 
-        self.points = sorted(self.points, key=lambda p: (
-            -1 if p.y <= cy else 1,  # Primero separar arriba/abajo
-            -p.x if p.x <= cx else p.x  # Luego izquierda/derecha
-        ))
+        cx = sum(p.x for p in self.points) / 4
+        cy = sum(p.y for p in self.points) / 4
+
+        def angle_from_center(p):
+            return math.atan2(p.y - cy, p.x - cx)
+
+        # Ordenar en sentido horario desde el ángulo más negativo
+        self.points.sort(key=angle_from_center)
 
     def clear(self):
         self.points = []

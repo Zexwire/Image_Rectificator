@@ -1,12 +1,21 @@
-from PySide6.QtWidgets import (
-    QApplication, QWidget, QPushButton, QVBoxLayout, QLabel, QMessageBox, QFrame, QFileDialog, QHBoxLayout
-)
-from PySide6.QtGui import QPainter, QPen, QMouseEvent, QPixmap, QFont, QPalette, QIcon
-from PySide6.QtCore import Qt, Signal, QLineF
 import sys
+import numpy as np
+from PySide6.QtWidgets import (QApplication, QWidget, QPushButton, QVBoxLayout, 
+                              QLabel, QMessageBox, QFrame, QFileDialog, QHBoxLayout)
+from PySide6.QtGui import (QPainter, QPen, QMouseEvent, QPixmap, QFont, 
+                          QPalette, QIcon, QImage)
+from PySide6.QtCore import Qt, Signal
+from PySide6.QtWidgets import QScrollArea
 
+from classes import Coordenadas, Punto
+from projective_transform import apply_projective_transform
 from infinity_line import calculate_infinity_line
-from classes import *
+
+def numpy_to_pixmap(image: np.ndarray) -> QPixmap:
+    height, width, channel = image.shape
+    bytes_per_line = 3 * width
+    q_image = QImage(image.data, width, height, bytes_per_line, QImage.Format_RGB888)
+    return QPixmap.fromImage(q_image)
 
 class ClickArea(QFrame):
     points_changed = Signal()
@@ -17,8 +26,8 @@ class ClickArea(QFrame):
         self.image = None
         self.setStyleSheet("background-color: #808080;")
         self.setMinimumSize(800, 800)
-        self.point_radius = 10  # Radio para detectar clics en puntos existentes
-        self.infinity_line = None  # DEBUG:  borrar después
+        self.point_radius = 10
+        self.infinity_line = None
 
     def load_image(self, image_path):
         original_image = QPixmap(image_path)
@@ -42,19 +51,16 @@ class ClickArea(QFrame):
             x = event.position().x()
             y = event.position().y()
 
-            # Primero verificar si se hizo clic en un punto existente
             if self.coordenadas.remove_point_near(x, y, self.point_radius):
+                self.infinity_line = None
                 self.points_changed.emit()
                 self.update()
             elif not self.coordenadas.is_complete():
                 self.coordenadas.add_point(x, y)
+                if self.coordenadas.is_complete():
+                    self.infinity_line = calculate_infinity_line(*self.coordenadas.get_points())
                 self.points_changed.emit()
                 self.update()
-
-    # DEBUG: Borrar después
-    def set_infinity_line(self, infinity_line):
-        self.infinity_line = infinity_line
-        self.update()  # Trigger a repaint
 
     def paintEvent(self, event):
         super().paintEvent(event)
@@ -64,41 +70,21 @@ class ClickArea(QFrame):
             painter.drawPixmap(0, 0, self.image)
 
         if self.coordenadas.points:
-
-            # El cambio de color está para debuggear el orden de los puntos. Se puede cambiar de vuelta a siempre rojo una vez sepamos que va bien
-            # COLORS
             colors = [Qt.GlobalColor.red, Qt.GlobalColor.green, Qt.GlobalColor.blue, Qt.GlobalColor.yellow]
-            # Dibujar puntos
             for i, point in enumerate(self.coordenadas.points):
                 pen = QPen(colors[i])
                 pen.setWidth(8)
                 painter.setPen(pen)
                 painter.drawPoint(int(point.x), int(point.y))
 
-        # DEBUG: Para ver si se están calculando bien los puntos intersección. Cuando terminemos con el primer sprint lo borramos
-        if self.infinity_line and len(self.coordenadas.points) >= 4:
+        if self.infinity_line:
             pen = QPen(Qt.GlobalColor.red)
             pen.setWidth(3)
             painter.setPen(pen)
-            points = self.coordenadas.get_points()
-            painter.drawLine(int(points[0].x), int(points[0].y),
-                           int(self.infinity_line[0].x), int(self.infinity_line[0].y))
-            painter.drawLine(int(points[2].x), int(points[2].y),
-                             int(self.infinity_line[0].x), int(self.infinity_line[0].y))
+            for p in self.infinity_line:
+                if p:
+                    painter.drawEllipse(int(p.x)-5, int(p.y)-5, 10, 10)
 
-            painter.drawLine(int(points[0].x), int(points[0].y),
-                           int(self.infinity_line[1].x), int(self.infinity_line[1].y))
-            painter.drawLine(int(points[1].x), int(points[1].y),
-                             int(self.infinity_line[1].x), int(self.infinity_line[1].y))
-
-            pen = QPen(Qt.GlobalColor.darkBlue)
-            pen.setWidth(3)
-            painter.setPen(pen)
-            painter.drawLine(int(self.infinity_line[0].x), int(self.infinity_line[0].y),
-                             int(self.infinity_line[1].x), int(self.infinity_line[1].y))
-        
-
-# TODO: @María hacer que el tamaño de la ventana sea adaptable y la imagen se ajuste manteniendo su proporción
 class ClickCaptureWidget(QWidget):
     def __init__(self):
         super().__init__()
@@ -171,7 +157,7 @@ class ClickCaptureWidget(QWidget):
         is_dark = palette.color(QPalette.Window).value() < 128
 
         if is_dark:
-            self.setStyleSheet("""
+            self.setStyleSheet(""" 
                 QWidget { background-color: #121212; color: #FFFFFF; }
                 QPushButton {
                     background-color: #333333; color: #FFFFFF;
@@ -182,7 +168,7 @@ class ClickCaptureWidget(QWidget):
                 QLabel { color: #FFFFFF; }
             """)
         else:
-            self.setStyleSheet("""
+            self.setStyleSheet(""" 
                 QWidget { background-color: #F0F0F0; color: #000000; }
                 QPushButton {
                     background-color: #E0E0E0; color: #000000;
@@ -202,19 +188,85 @@ class ClickCaptureWidget(QWidget):
 
     def accept_points(self):
         if self.click_area.coordenadas.is_complete():
-            points = self.click_area.coordenadas.get_points()
-            message = "\n".join([f"Punto {i + 1}: ({p.x:.1f}, {p.y:.1f})" for i, p in enumerate(points)])
-            QMessageBox.information(self, "Puntos seleccionados", message)
-            self.draw_lines() # DEBUG: Borrar después
+            try:
+                # Convertir QPixmap a numpy array
+                qimage = self.click_area.image.toImage().convertToFormat(QImage.Format_RGB888)
+                width, height = qimage.width(), qimage.height()
+                ptr = qimage.constBits()
+                arr = np.array(ptr).reshape(height, width, 3)
+                
+                # Rectificar imagen
+                rectified = apply_projective_transform(arr, self.click_area.coordenadas.get_points())
+                
+                # Crear o actualizar ventana de resultados
+                if not hasattr(self, 'result_window'):
+                    self.result_window = QWidget()
+                    self.result_window.setWindowTitle("Imagen Rectificada")
+                    self.result_window.setMinimumSize(400, 400)  # Tamaño mínimo
+                    self.result_window.resize(600, 600)          # Tamaño inicial
+                    
+                    # Layout principal
+                    self.result_layout = QVBoxLayout(self.result_window)
+                    
+                    # Área de scroll (para imágenes grandes)
+                    self.scroll_area = QScrollArea()
+                    self.scroll_area.setWidgetResizable(True)
+                    
+                    # Label para la imagen (dentro del scroll)
+                    self.result_label = QLabel()
+                    self.result_label.setAlignment(Qt.AlignCenter)
+                    self.scroll_area.setWidget(self.result_label)
+                    
+                    # Botón para guardar
+                    self.save_button = QPushButton("Guardar Imagen")
+                    self.save_button.clicked.connect(lambda: self.save_image(self.result_label.pixmap()))
+                    
+                    # Añadir widgets al layout
+                    self.result_layout.addWidget(self.scroll_area)
+                    self.result_layout.addWidget(self.save_button)
+                
+                # Mostrar la imagen rectificada
+                height, width, _ = rectified.shape
+                bytes_per_line = 3 * width
+                qimage = QImage(rectified.data, width, height, bytes_per_line, QImage.Format_RGB888)
+                self.original_pixmap = QPixmap.fromImage(qimage)  # Guardamos la imagen original
+                
+                # Escalar la imagen al tamaño actual del scroll area
+                self.update_image_size()
+                
+                # Conectar el redimensionamiento de la ventana
+                self.result_window.resizeEvent = lambda event: self.update_image_size()
+                
+                self.result_window.show()
+                self.result_window.raise_()
+                
+            except Exception as e:
+                QMessageBox.critical(self, "Error", f"Error al rectificar:\n{str(e)}")
         else:
-            QMessageBox.warning(self, "Error", "Debes seleccionar exactamente 4 puntos")
+            QMessageBox.warning(self, "Error", "Se necesitan exactamente 4 puntos")
 
-    # DEBUG: Borrar después
-    def draw_lines(self):
-        points = self.click_area.coordenadas.get_points()
-        infinity_line = calculate_infinity_line(points[0], points[1], points[2], points[3])
-        self.click_area.set_infinity_line(infinity_line)
-        
+    def update_image_size(self):
+        """Actualiza el tamaño de la imagen cuando se redimensiona la ventana"""
+        if hasattr(self, 'result_window') and hasattr(self, 'original_pixmap'):
+            # Calcula el nuevo tamaño (dejando espacio para el botón y márgenes)
+            new_width = self.scroll_area.width() - 20
+            if new_width > 0:
+                scaled_pixmap = self.original_pixmap.scaledToWidth(
+                    new_width, 
+                    Qt.SmoothTransformation
+                )
+                self.result_label.setPixmap(scaled_pixmap)
+
+    def save_image(self, pixmap):
+        file_path, _ = QFileDialog.getSaveFileName(
+            self, 
+            "Guardar Imagen Rectificada", 
+            "", 
+            "Imágenes (*.png *.jpg *.bmp)"
+        )
+        if file_path:
+            pixmap.save(file_path)
+
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = ClickCaptureWidget()

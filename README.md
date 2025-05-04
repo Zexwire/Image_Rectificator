@@ -10,8 +10,8 @@ Herramientas: OpenCV (procesamiento de imágenes) y NumPy (matrices). Tkinter y 
 - (M - 23/04) Crear una ventana + Crear función que debe recibir como input 4 clicks del usuario en la ventana, y como output las coordenadas relativas de dichos clicks en la ventana. Lo ideal sería que el usuario haga 4 clicks y se active un botón tipo "Aceptar" para que el input se pase a la función.
 - (C - 28/04) Función que dadas 4 coordenadas calcule las coordenadas de dos puntos de la recta del infinito
 - (C - 28/04) Crear clase coordenada, que tenga como primer punto 0 o 1. 
-- (J - 02/05) Función que dada una base y unos puntos transforme los puntos a referencia estándar
-- (J - 02/05) Función que halle la referencia proyectiva y calcular la aplicación con la base asociada. Utilizar la función Raw Reduce para triangular. (Ajustar los números entre los puntos que se quieren transformar)
+- (M - 02/05) Función que dada una base y unos puntos transforme los puntos a referencia estándar
+- (M - 02/05) Función que halle la referencia proyectiva y calcular la aplicación con la base asociada. Utilizar la función Raw Reduce para triangular. (Ajustar los números entre los puntos que se quieren transformar)
 - (M - 05/05) Función que muestre el resultado final con la rectificación de la imagen dados los puntos iniciales y finales. Transformación dadas unas coordenadas iniciales y unas coordenadas finales.
 - (05/05 a poder ser) Reunión con Jonatan (consultar si eliminar el fondo de la imagen o no)
 

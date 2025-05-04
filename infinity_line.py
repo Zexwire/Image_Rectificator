@@ -1,14 +1,24 @@
 from classes import Punto
 
-# TODO: Renombrar este archivo si lo veis necesario (no estaba segura de como llamarlo)
 def calculate_infinity_line(p1: Punto, p2: Punto, p3: Punto, p4: Punto):
-
-    p = intersection([p1, p2], [p3, p4])
-    q = intersection([p1, p3], [p2, p4])
-
-    return [p, q] # TODO: @Jacob, si necesitas modificar lo que devuelve esta función 0 problema, de momento lo dejo como los 2 puntos de la recta del infinito
+    """
+    Calcula la línea del infinito como la intersección de las líneas paralelas
+    Devuelve dos puntos que definen la línea del infinito
+    """
+    # Calcular puntos de infinito como intersecciones de líneas opuestas
+    p = intersection([p1, p2], [p3, p4])  # Intersección de lados opuestos 1-2 y 3-4
+    q = intersection([p1, p3], [p2, p4])  # Intersección de lados opuestos 1-3 y 2-4
+    
+    # Verificar si alguno de los puntos es None (líneas paralelas)
+    if p is None or q is None:
+        raise ValueError("No se pudo calcular la línea del infinito (algunas líneas son paralelas)")
+    
+    return [p, q]
 
 def intersection(r1, r2):
+    """
+    Calcula la intersección de dos líneas definidas por dos puntos cada una
+    """
     x1, y1 = r1[0].x, r1[0].y
     x2, y2 = r1[1].x, r1[1].y
     x3, y3 = r2[0].x, r2[0].y
