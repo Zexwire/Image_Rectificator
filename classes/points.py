@@ -1,30 +1,24 @@
 import math
 
-class Punto:
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-    def to_tuple(self):
-        return (self.x, self.y)
-
-class PuntoProyectivo:
-    def __init__(self, inf, x, y):
-        self.inf = inf #0/1 que define si está o no en la recta del infinito
+class Point:
+    def __init__(self, x, y, w):
+        self.point = (x, y, w)
         self.x = x
         self.y = y
 
-    @classmethod
-    def proyectar(cls, inf, punto):
-        return cls(inf, punto.x, punto.y)
-
-class Coordenadas:
+class Coordinates:
     def __init__(self, max_points=4):
         self.max_points = max_points
         self.points = []
 
-    def add_point(self, x, y):
+    def set_points(self, points):
+        self.clear()
+        self.points = points
+        self.order_points()
+
+    def add_point(self, x, y, w):
         if len(self.points) < self.max_points:
-            self.points.append(Punto(x, y))
+            self.points.append(Point(x, y, w))
             self.order_points()
             return True
         return False
@@ -39,17 +33,17 @@ class Coordenadas:
         return False
 
     def order_points(self):
-        if len(self.points) != 4:
-            return
+        # 1 ----- 2
+        # |       |
+        # |       |
+        # 3 ----- 4
+        cx = sum(p.x for p in self.points) / len(self.points)
+        cy = sum(p.y for p in self.points) / len(self.points)
 
-        cx = sum(p.x for p in self.points) / 4
-        cy = sum(p.y for p in self.points) / 4
-
-        def angle_from_center(p):
-            return math.atan2(p.y - cy, p.x - cx)
-
-        # Ordenar en sentido horario desde el ángulo más negativo
-        self.points.sort(key=angle_from_center)
+        self.points = sorted(self.points, key=lambda p: (
+            -1 if p.y <= cy else 1,  # Primero separar arriba/abajo
+            -p.x if p.x <= cx else p.x  # Luego izquierda/derecha
+        ))
 
     def clear(self):
         self.points = []
