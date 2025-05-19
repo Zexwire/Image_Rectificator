@@ -11,6 +11,9 @@ class Coordinates:
         self.max_points = max_points
         self.points = []
 
+    def __iter__(self):
+        return iter(self.points)
+
     def set_points(self, points):
         self.clear()
         self.points = points

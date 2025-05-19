@@ -63,8 +63,9 @@ class ApplicationWindow(QMainWindow):
         self.transform_button.setEnabled(enabled)
     def transform_image(self):
         try:
-            sqr_points = find_sqr_points(self.click_area.coordinates.get_points(), self.ASPECT_RATIO)
-            H = calculate_homography(sqr_points)
-            # TODO: transformar la imagen usando la homografía H y "sobreescribirla" una vez transformada en la propia ventana
+            if not self.click_area.square_points and self.click_area.aspect_ratio:
+                self.click_area.square_points = find_sqr_points(self.click_area.coordinates, self.click_area.aspect_ratio)
+            H = calculate_homography(self.click_area.square_points, self.click_area.width() if self.click_area.width() < self.click_area.height() else self.click_area.height())
+            self.click_area.image = warp_perspective_qpixmap(self.click_area.image, H, (self.click_area.width(),self.click_area.height()))
         except Exception as e:
             QMessageBox.critical(self, "Error", f"Error al rectificar:\n{str(e)}")
