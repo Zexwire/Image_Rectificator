@@ -5,6 +5,7 @@ class Point:
         self.point = (x, y, w)
         self.x = x
         self.y = y
+        self.w = w
 
 class Coordinates:
     def __init__(self, max_points=4):

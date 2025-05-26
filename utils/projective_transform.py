@@ -1,5 +1,5 @@
 from numpy import (array, zeros, uint8)
-from numpy.linalg import (lstsq, inv)
+from numpy.linalg import (inv, solve)
 
 from PySide6.QtGui import (QImage, QPixmap)
 
@@ -47,75 +47,40 @@ def calculate_homography(sqr_points: Coordinates, output_sqr):
     vanishing_points = calculate_vanish_points(*sqr_points.get_points())
 
     # Buscamos una homografía tal que:
-    # [v1] -> [0 : 1 : 0]
-    # [v2] -> [1 : 0 : 0]
-    # [sqr_points[0]] -> [-1 : 1 : 1]
-    # [sqr_points[1]] -> [1 : 1 : 1]
-    # [sqr_points[2]] -> [-1 : -1 : 1]
-    # [sqr_points[3]] -> [1 : -1 : 1]
-    target_vanishing = [array([0, 1, 0]), array([1, 0, 0])]
-    target_sqr = [
-        array([1, 1, 1]),
-        array([output_sqr - 1, 1, 1]),
-        array([1, output_sqr - 1, 1]),
-        array([output_sqr - 1, output_sqr - 1, 1])
-    ]
+    # [v1] -> [1 : 0 : 0]
+    # [v2] -> [0 : 1 : 0]
+    # [sqr_points[0]] -> [1 : 1 : 1]
+    # [sqr_points[3]] -> [output_sqr - 1 : output_sqr - 1 : 1]
+    src_lin = array([
+        vanishing_points[0],
+        vanishing_points[1],
+        sqr_points.points[0]
+    ])
+    src_final = array(sqr_points.points[3])
 
-    A = []
-    b = []
+    target_lin = array([
+        [1, 0, 0],
+        [0, 1, 0],
+        [1, 1, 1]
+    ])
+    target_final = array([output_sqr - 1, output_sqr - 1, 1]).reshape(3, 1)
 
-    # Añadimos las restricciones de los puntos del infinito
-    for vp_src, vp_dst in zip(vanishing_points, target_vanishing):
-        x, y, z = vp_src.point
-        X, Y, Z = vp_dst
+    modifiers_src = solve(src_lin, src_final)
+    modifiers_target = solve(target_lin, target_final)
 
-        # Para [1,0,0]: h11*x + h12*y + z*h13 = lambda, h21*x + h22*y + z*h23 = 0
-        if X == 1 and Y == 0:
-            # componente X = lambda, componente Y = 0
-            A.append([x, y , z, 0, 0, 0, 0, 0, 0])
-            b.append(1)
-            A.append([0, 0, 0, x, y , z, 0, 0, 0])
-            b.append(0)
-        # Para [0,1,0]: h11*x + h12*y + z*h13 = 0, h21*x + h22*y + z*h23 = lambda
-        elif X == 0 and Y == 1:
-            # componente X = 0, componente Y = lambda
-            A.append([x, y , z, 0, 0, 0, 0, 0, 0])
-            b.append(0)
-            A.append([0, 0, 0, x, y , z, 0, 0, 0])
-            b.append(1)
-        else:
-            raise ValueError("Vanishing point must be at infinity with either x or y component 1.")
+    canonical_change = array([
+        [modifiers_src[0] * vanishing_points[0]],
+        [modifiers_src[1] * vanishing_points[1]],
+        [modifiers_src[2] * sqr_points.points[0]]
+    ]).T
 
-        # Al ser de la recta del infinito la última componente es cero para ambas
-        # h31*x + h32*y + z*h33 = 0
-        A.append([0, 0, 0, 0, 0, 0, x, y, z])
-        b.append(0)
+    lineal_application_matrix = array([
+        [modifiers_target[0] * [1, 0, 0]],
+        [modifiers_target[1] * [0, 1, 0]],
+        [modifiers_target[2] * [1, 1, 1]]
+    ]).T
 
-    for sqrp_src, sqrp_dst in zip(sqr_points, target_sqr):
-        x, y, z = sqrp_src.point
-        X, Y, Z = sqrp_dst
-
-        # Dos ecuaciones por punto del cuadrado
-        # h11*x + h12*y + h13 - X*(h31*x + h32*y + h33) = 0
-        A.append([x, y, 1, 0, 0, 0, -X * x, -X * y, -X * z])
-        b.append(0)
-        # h21*x + h22*y + h23 - Y*(h31*x + h32*y + h33) = 0
-        A.append([0, 0, 0, x, y, 1, -Y * x, -Y * y, -Y * z])
-        b.append(0)
-
-    A = array(A)
-    b = array(b)
-
-    # Resolvemos el sistema de ecuaciones con el método de mínimos cuadrados
-    H_flat, residuals, rank, s = lstsq(A, b, rcond=None)
-
-    H = H_flat.reshape(3, 3)
-
-    # Normalizar como hace OpenCV en última componente a 1(no estoy seguro de esto)
-    if H[2, 2] != 0:
-        H /= H[2, 2]
-
-    return H
+    return lineal_application_matrix @ inv(canonical_change)
 
 def qpixmap_to_numpy(pixmap):
     """Convertir de QPixmap a NumPy array (RGB)."""

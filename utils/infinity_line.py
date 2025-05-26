@@ -1,4 +1,5 @@
 from classes.points import Point
+import numpy as np
 
 # TODO: Check el caso en el que dos de las líneas sean paralelas
 def calculate_vanish_points(p1: Point, p2: Point, p3: Point, p4: Point) -> list[Point]:
@@ -49,3 +50,16 @@ def intersection(r1, r2):
     y = (a1 * c2 - a2 * c1) / det
 
     return Point(x, y, 1)
+
+"""
+# TODO: Prueba en proyectiva
+
+    # r1 y r2 son listas de dos puntos cada una, en coordenadas homogéneas
+    l1 = np.cross([r1[0].x, r1[0].y], [r1[1].x, r1[1].y])
+    l2 = np.cross([r2[0].x, r2[0].y], [r2[1].x, r2[1].y])
+    inter = np.cross(l1, l2)
+    # Normaliza si el punto no está en el infinito
+    if inter[2] != 0:
+        inter = inter / inter[2]
+    return Point(inter[0],inter[1],inter[2])  # Devuelve [x, y, w]
+"""
