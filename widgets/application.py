@@ -8,6 +8,8 @@ from widgets.buttons import PrimaryButton, SecondaryButton
 from widgets.click_area import ClickArea
 from widgets.menu import Menu, AspectRatioWidget
 
+import traceback
+
 class ApplicationWindow(QMainWindow):
     ASPECT_RATIO = 0.0
     def __init__(self):
@@ -68,4 +70,5 @@ class ApplicationWindow(QMainWindow):
             H = calculate_homography(self.click_area.square_points, self.click_area.width() if self.click_area.width() < self.click_area.height() else self.click_area.height())
             self.click_area.image = warp_perspective_qpixmap(self.click_area.image, H, (self.click_area.width(),self.click_area.height()))
         except Exception as e:
-            QMessageBox.critical(self, "Error", f"Error al rectificar:\n{str(e)}")
+            tb = traceback.format_exc()
+            QMessageBox.critical(self, "Error", f"Error al rectificar:\n{str(e)}\n\n{tb}")

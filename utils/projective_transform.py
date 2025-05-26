@@ -52,11 +52,11 @@ def calculate_homography(sqr_points: Coordinates, output_sqr):
     # [sqr_points[0]] -> [1 : 1 : 1]
     # [sqr_points[3]] -> [output_sqr - 1 : output_sqr - 1 : 1]
     src_lin = array([
-        vanishing_points[0],
-        vanishing_points[1],
-        sqr_points.points[0]
+        array(vanishing_points[0].point),
+        array(vanishing_points[1].point),
+        array(sqr_points.points[0].point)
     ])
-    src_final = array(sqr_points.points[3])
+    src_final = array(sqr_points.points[3].point).reshape(3, 1)
 
     target_lin = array([
         [1, 0, 0],
@@ -69,9 +69,9 @@ def calculate_homography(sqr_points: Coordinates, output_sqr):
     modifiers_target = solve(target_lin, target_final)
 
     canonical_change = array([
-        [modifiers_src[0] * vanishing_points[0]],
-        [modifiers_src[1] * vanishing_points[1]],
-        [modifiers_src[2] * sqr_points.points[0]]
+        [modifiers_src[0] * array(vanishing_points[0].point)],
+        [modifiers_src[1] * array(vanishing_points[1].point)],
+        [modifiers_src[2] * array(sqr_points.points[0].point)]
     ]).T
 
     lineal_application_matrix = array([
