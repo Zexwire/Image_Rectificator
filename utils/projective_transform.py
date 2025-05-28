@@ -42,10 +42,16 @@ def calculate_homography(sqr_points: Coordinates, output_sqr):
     :param sqr_points: 4 puntos del cuadrilátero original, de la forma [x : y : 1]
     :return: matriz de homografía
     """
+    print(output_sqr)
+    print("sqr_points given:")
 
     # Hallar los puntos de fuga
     vanishing_points = calculate_vanish_points(*sqr_points.get_points())
 
+    print(vanishing_points[0].point)
+    print(vanishing_points[1].point)
+    print(sqr_points.points[0].point)
+    print(sqr_points.points[3].point)
     # Buscamos una homografía tal que:
     # [v1] -> [1 : 0 : 0]
     # [v2] -> [0 : 1 : 0]
@@ -55,32 +61,80 @@ def calculate_homography(sqr_points: Coordinates, output_sqr):
         array(vanishing_points[0].point),
         array(vanishing_points[1].point),
         array(sqr_points.points[0].point)
-    ])
+    ]).T
     src_final = array(sqr_points.points[3].point).reshape(3, 1)
 
     target_lin = array([
         [1, 0, 0],
         [0, 1, 0],
         [1, 1, 1]
-    ])
+    ]).T
     target_final = array([output_sqr - 1, output_sqr - 1, 1]).reshape(3, 1)
 
     modifiers_src = solve(src_lin, src_final)
     modifiers_target = solve(target_lin, target_final)
 
+    print("Modifiers_src:")
+    print(modifiers_src[0])
+    print(modifiers_src[1])
+    print(modifiers_src[2])
+    print("Check if they get the final point:")
+    print(modifiers_src[0] * array(vanishing_points[0].point) + modifiers_src[1] * array(vanishing_points[1].point) + modifiers_src[2] * array(sqr_points.points[0].point))
+    print("Modifiers_target:")
+    print(modifiers_target[0])
+    print(modifiers_target[1])
+    print(modifiers_target[2])
+    print("Check if they get the final point:")
+    print(modifiers_target[0] * [1, 0, 0] + modifiers_target[1] * [0, 1, 0] + modifiers_target[2] * [1, 1, 1])
+
     canonical_change = array([
-        [modifiers_src[0] * array(vanishing_points[0].point)],
-        [modifiers_src[1] * array(vanishing_points[1].point)],
-        [modifiers_src[2] * array(sqr_points.points[0].point)]
+        modifiers_src[0] * array(vanishing_points[0].point),
+        modifiers_src[1] * array(vanishing_points[1].point),
+        modifiers_src[2] * array(sqr_points.points[0].point)
     ]).T
+    print("Canonical change:")
+    print(canonical_change)
 
     lineal_application_matrix = array([
-        [modifiers_target[0] * [1, 0, 0]],
-        [modifiers_target[1] * [0, 1, 0]],
-        [modifiers_target[2] * [1, 1, 1]]
+        modifiers_target[0] * [1, 0, 0],
+        modifiers_target[1] * [0, 1, 0],
+        modifiers_target[2] * [1, 1, 1]
     ]).T
+    print("lineal application matrix:")
+    print(lineal_application_matrix)
 
-    return lineal_application_matrix @ inv(canonical_change)
+    print("inverse of canonical change:")
+    print(inv(canonical_change))
+
+    H = lineal_application_matrix @ inv(canonical_change)
+
+    print("Homography matrix pre normalize: ")
+    print(H)
+
+    if H[2, 2] != 0:
+        H /= H[2, 2]
+
+    print("Homography matrix post normalize: ")
+    print(H)
+    
+    point_images0 = H @ array(sqr_points.points[0].point)
+    point_images1 = H @ array(sqr_points.points[1].point)
+    point_images2 = H @ array(sqr_points.points[2].point)
+    point_images3 = H @ array(sqr_points.points[3].point)
+
+    inf_image0 = H @ array(vanishing_points[0].point)
+    inf_image1 = H @ array(vanishing_points[1].point)
+
+    print("Images of the square: ")
+    print(point_images0)
+    print(point_images1)
+    print(point_images2)
+    print(point_images3)
+    print("Images of infinite: ")
+    print(inf_image0)
+    print(inf_image1)
+
+    return H
 
 def qpixmap_to_numpy(pixmap):
     """Convertir de QPixmap a NumPy array (RGB)."""
@@ -117,7 +171,7 @@ def warp_perspective_qpixmap(src_pixmap: QPixmap, H: array, output_size: tuple) 
 
     for y_dst in range(height):
         for x_dst in range(width):
-            dst_pt = array([x_dst, y_dst, 1])
+            dst_pt = array([y_dst, x_dst, 1])
             src_pt = H_inv @ dst_pt
             src_x = float(src_pt[0] / src_pt[2])
             src_y = float(src_pt[1] / src_pt[2])
