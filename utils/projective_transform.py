@@ -117,12 +117,12 @@ def calculate_homography(sqr_points: Coordinates, output_sqr, aspect_ratio: floa
     print("Homography matrix post normalize: ")
     print(H)
 
-    b = aspect_ratio
+    b = 1 / aspect_ratio
     c = max(1, b)
 
-    H = array([ [1, 0, 0],
-                [0, b, 0],
-                [0, 0, c]]) @ H
+    H = array([ [b, 0, 0],
+                [0, c, 0],
+                [0, 0, 1]]) @ H
     
     point_images0 = H @ array(sqr_points.points[0].point)
     point_images1 = H @ array(sqr_points.points[1].point)
