@@ -1,4 +1,4 @@
-from numpy import (array, zeros, uint8)
+from numpy import (array, zeros, uint8, frombuffer)
 from numpy.linalg import (inv, solve)
 
 from PySide6.QtGui import (QImage, QPixmap)
@@ -36,7 +36,7 @@ def find_sqr_points(corners: Coordinates, aspect_ratio: float) -> Coordinates:
     return coordinates
 
 
-def calculate_homography(sqr_points: Coordinates, output_sqr):
+def calculate_homography(sqr_points: Coordinates, output_sqr, aspect_ratio: float):
     """
     Calcula la homografía que rectifica la imagen usando los puntos de fuga
     :param sqr_points: 4 puntos del cuadrilátero original, de la forma [x : y : 1]
@@ -116,6 +116,13 @@ def calculate_homography(sqr_points: Coordinates, output_sqr):
 
     print("Homography matrix post normalize: ")
     print(H)
+
+    b = aspect_ratio
+    c = max(1, b)
+
+    H = array([ [1, 0, 0],
+                [0, b, 0],
+                [0, 0, c]]) @ H
     
     point_images0 = H @ array(sqr_points.points[0].point)
     point_images1 = H @ array(sqr_points.points[1].point)
@@ -139,11 +146,12 @@ def calculate_homography(sqr_points: Coordinates, output_sqr):
 def qpixmap_to_numpy(pixmap):
     """Convertir de QPixmap a NumPy array (RGB)."""
     q_image = pixmap.toImage().convertToFormat(QImage.Format_RGB888)
+    stride = q_image.bytesPerLine()
     width = q_image.width()
     height = q_image.height()
     ptr = q_image.bits()
-    arr = array(ptr, dtype=uint8).reshape((height, width, 3))
-    return arr
+    buffer = frombuffer(ptr, dtype=uint8).reshape(height, stride)[:, :width*3]
+    return buffer.reshape((height, width, 3))
 
 def numpy_to_qpixmap(arr):
     """Convertir de NumPy array (RGB) a QPixmap."""
@@ -171,7 +179,7 @@ def warp_perspective_qpixmap(src_pixmap: QPixmap, H: array, output_size: tuple) 
 
     for y_dst in range(height):
         for x_dst in range(width):
-            dst_pt = array([y_dst, x_dst, 1])
+            dst_pt = array([x_dst, y_dst, 1])
             src_pt = H_inv @ dst_pt
             src_x = float(src_pt[0] / src_pt[2])
             src_y = float(src_pt[1] / src_pt[2])

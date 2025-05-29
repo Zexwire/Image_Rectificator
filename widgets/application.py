@@ -65,9 +65,10 @@ class ApplicationWindow(QMainWindow):
         self.transform_button.setEnabled(enabled)
     def transform_image(self):
         try:
-            if not self.click_area.square_points and self.click_area.aspect_ratio:
-                self.click_area.square_points = find_sqr_points(self.click_area.coordinates, self.click_area.aspect_ratio)
-            H = calculate_homography(self.click_area.square_points, self.click_area.width() if self.click_area.width() < self.click_area.height() else self.click_area.height())
+            self.click_area.square_points = self.click_area.coordinates
+            #if not self.click_area.square_points and self.click_area.aspect_ratio:
+            #    self.click_area.square_points = find_sqr_points(self.click_area.coordinates, self.click_area.aspect_ratio)
+            H = calculate_homography(self.click_area.coordinates, self.click_area.width() if self.click_area.width() < self.click_area.height() else self.click_area.height(), self.click_area.aspect_ratio)
             self.click_area.image = warp_perspective_qpixmap(self.click_area.image, H, (self.click_area.width(),self.click_area.height()))
         except Exception as e:
             tb = traceback.format_exc()

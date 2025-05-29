@@ -23,7 +23,7 @@ class Coordinates:
     def add_point(self, x, y, w):
         if len(self.points) < self.max_points:
             self.points.append(Point(x, y, w))
-            self.order_points()
+            #self.order_points()
             return True
         return False
 
