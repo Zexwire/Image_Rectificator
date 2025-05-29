@@ -1,7 +1,7 @@
 from PySide6.QtCore import QStandardPaths
 
 from PySide6.QtWidgets import (QWidget, QVBoxLayout,
-                               QMessageBox, QFileDialog, QHBoxLayout, QMainWindow, QStackedLayout, QApplication)
+                               QMessageBox, QFileDialog, QHBoxLayout, QMainWindow)
 
 from utils.projective_transform import *
 from widgets.buttons import PrimaryButton, SecondaryButton
@@ -75,7 +75,7 @@ class ApplicationWindow(QMainWindow):
         self.click_area.set_aspect_ratio(self.ASPECT_RATIO)
         enabled = self.click_area.coordinates.is_complete() and self.ASPECT_RATIO != 0
         self.transform_button.setEnabled(enabled)
-        self.clear_points_button.setEnabled(self.click_area.coordinates is not None)
+        self.clear_points_button.setEnabled(len(self.click_area.coordinates.points) > 0)
     def transform_image(self):
         try:
             self.overlay_loading_widget.show_loading(True)

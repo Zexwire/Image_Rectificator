@@ -1,4 +1,4 @@
-from PySide6.QtCore import Qt, Signal, QTimer
+from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import (QPainter, QPen, QMouseEvent, QPixmap, QMovie)
 from PySide6.QtWidgets import QWidget, QLabel, QVBoxLayout, QApplication
 
@@ -42,7 +42,6 @@ class OverlayWidget(QWidget):
         else:
             self.hide()
 
-# TODO: Añadir un botón de "clear points" o "borrar puntos" que elimine todos los puntos marcados
 class ClickArea(QWidget):
     points_changed = Signal()
 
