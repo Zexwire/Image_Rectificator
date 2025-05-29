@@ -143,16 +143,6 @@ def calculate_homography(sqr_points: Coordinates, output_sqr, aspect_ratio: floa
 
     return H
 
-def qpixmap_to_numpy(pixmap):
-    """Convertir de QPixmap a NumPy array (RGB)."""
-    q_image = pixmap.toImage().convertToFormat(QImage.Format_RGB888)
-    stride = q_image.bytesPerLine()
-    width = q_image.width()
-    height = q_image.height()
-    ptr = q_image.bits()
-    buffer = frombuffer(ptr, dtype=uint8).reshape(height, stride)[:, :width*3]
-    return buffer.reshape((height, width, 3))
-
 def numpy_to_qpixmap(arr):
     """Convertir de NumPy array (RGB) a QPixmap."""
     height, width, channels = arr.shape
@@ -172,7 +162,13 @@ def warp_perspective_qpixmap(src_pixmap: QPixmap, H: array, output_size: tuple) 
     Retorna:
         QPixmap: Imagen distorsionada por la homografía en formato QPixmap
     """
-    src_img = qpixmap_to_numpy(src_pixmap)
+    q_image = src_pixmap.toImage().convertToFormat(QImage.Format_RGB888)
+    src_stride = q_image.bytesPerLine()
+    src_width = q_image.width()
+    src_height = q_image.height()
+    src_ptr = q_image.bits()
+    src_buffer = frombuffer(src_ptr, dtype=uint8).reshape(src_height, src_stride)[:, :src_width * 3]
+    src_img = src_buffer.reshape((src_height, src_width, 3))
     width, height = output_size
     dst_img = zeros((height, width, src_img.shape[2]), dtype=src_img.dtype)
     H_inv = inv(H)
