@@ -1,11 +1,11 @@
 from PySide6.QtCore import QStandardPaths
 
 from PySide6.QtWidgets import (QWidget, QVBoxLayout,
-                               QMessageBox, QFileDialog, QHBoxLayout, QMainWindow)
+                               QMessageBox, QFileDialog, QHBoxLayout, QMainWindow, QStackedLayout, QApplication)
 
 from utils.projective_transform import *
 from widgets.buttons import PrimaryButton, SecondaryButton
-from widgets.click_area import ClickArea
+from widgets.click_area import ClickArea, OverlayWidget
 from widgets.menu import Menu, AspectRatioWidget
 
 import traceback
@@ -18,6 +18,9 @@ class ApplicationWindow(QMainWindow):
 
         main_layout = QHBoxLayout()
 
+        self.click_area = ClickArea(self)
+        self.click_area.points_changed.connect(self.update_transform_button)
+
         menu_container_widget = QWidget()
         menu_container_widget.setFixedWidth(500)
 
@@ -26,6 +29,10 @@ class ApplicationWindow(QMainWindow):
 
         self.open_image_button = SecondaryButton("Abrir Imagen")
         self.open_image_button.clicked.connect(self.open_image)
+
+        self.clear_points_button = SecondaryButton("Limpiar Puntos")
+        self.clear_points_button.setEnabled(False)
+        self.clear_points_button.clicked.connect(self.click_area.clear_points)
 
         self.transform_button = PrimaryButton("Rectificar")
         self.transform_button.setEnabled(False)
@@ -37,15 +44,20 @@ class ApplicationWindow(QMainWindow):
         menu_layout.addWidget(Menu(self.aspect_ratio_widget))
         menu_layout.addStretch()
         menu_layout.addWidget(self.open_image_button)
+        menu_layout.addWidget(self.clear_points_button)
         menu_layout.addWidget(self.transform_button)
 
         menu_container_widget.setLayout(menu_layout)
 
-        self.click_area = ClickArea(self)
-        self.click_area.points_changed.connect(self.update_transform_button)
+        click_area_container = QWidget()
+        click_area_layout = QVBoxLayout(click_area_container)
+        click_area_layout.setContentsMargins(0, 0, 0, 0)
+        click_area_layout.addWidget(self.click_area)
+
+        self.overlay_loading_widget = OverlayWidget(self.click_area)
 
         main_layout.addWidget(menu_container_widget)
-        main_layout.addWidget(self.click_area)
+        main_layout.addWidget(click_area_container)
 
         container = QWidget()
         container.setLayout(main_layout)
@@ -63,13 +75,17 @@ class ApplicationWindow(QMainWindow):
         self.click_area.set_aspect_ratio(self.ASPECT_RATIO)
         enabled = self.click_area.coordinates.is_complete() and self.ASPECT_RATIO != 0
         self.transform_button.setEnabled(enabled)
+        self.clear_points_button.setEnabled(self.click_area.coordinates is not None)
     def transform_image(self):
         try:
-            self.click_area.square_points = self.click_area.coordinates
-            #if not self.click_area.square_points and self.click_area.aspect_ratio:
-            #    self.click_area.square_points = find_sqr_points(self.click_area.coordinates, self.click_area.aspect_ratio)
+            self.overlay_loading_widget.show_loading(True)
+
             H = calculate_homography(self.click_area.coordinates, self.click_area.width() if self.click_area.width() < self.click_area.height() else self.click_area.height(), self.click_area.aspect_ratio)
             self.click_area.image = warp_perspective_qpixmap(self.click_area.image, H, (self.click_area.width(),self.click_area.height()))
+
+            self.overlay_loading_widget.show_loading(False)
+            self.click_area.clear_points()
         except Exception as e:
+            self.overlay_loading_widget.show_loading(False)
             tb = traceback.format_exc()
             QMessageBox.critical(self, "Error", f"Error al rectificar:\n{str(e)}\n\n{tb}")

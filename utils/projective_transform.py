@@ -6,40 +6,12 @@ from PySide6.QtGui import (QImage, QPixmap)
 from classes.points import (Coordinates, Point)
 from utils.infinity_line import calculate_vanish_points
 
-def find_sqr_points(corners: Coordinates, aspect_ratio: float) -> Coordinates:
-    if aspect_ratio == 1:
-        return corners
-    # Usando la razón, siendo P = corners[0], Q = corners[1], R = corners[2] y S = corners[3]
-    # Podemos hallar R' y S' de la forma:
-    # [P, R, R'] = aspect_ratio -> PR = aspect_ratio PR' -> rx-px/a +px= r'x
-    # Y análogo para S'
-    pts = corners.get_points()
-    P = pts[0]
-    Q = pts[1]
-    R = pts[2]
-    S = pts[3]
-
-    # Hallemos R' y S'
-    Rx = P.x + (R.x - P.x) / aspect_ratio
-    Ry = P.y + (R.y - P.y) / aspect_ratio
-    Sx = Q.x + (S.x - Q.x) / aspect_ratio
-    Sy = Q.y + (S.y - Q.y) / aspect_ratio
-
-    # De esta forma:
-    # P --- Q
-    # |     |
-    # R'--- S'
-    # |     |
-    # R --- S
-    coordinates = Coordinates()
-    coordinates.set_points([P, Q, Point(Rx, Ry, 1), Point(Sx, Sy, 1)])
-    return coordinates
-
-
 def calculate_homography(sqr_points: Coordinates, output_sqr, aspect_ratio: float):
     """
     Calcula la homografía que rectifica la imagen usando los puntos de fuga
     :param sqr_points: 4 puntos del cuadrilátero original, de la forma [x : y : 1]
+    :param aspect_ratio:
+    :param output_sqr:
     :return: matriz de homografía
     """
     print(output_sqr)
@@ -152,7 +124,7 @@ def numpy_to_qpixmap(arr):
 
 def warp_perspective_qpixmap(src_pixmap: QPixmap, H: array, output_size: tuple) -> QPixmap:
     """
-    Warps a QPixmap using a homography matrix with nearest neighbor interpolation.
+    Warps a QPixmap using a homography matrix with the nearest neighbor interpolation.
 
     Parámetros:
         src_pixmap (QPixmap): Imagen original

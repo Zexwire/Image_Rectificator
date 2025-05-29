@@ -37,6 +37,9 @@ class SecondaryButton(QPushButton):
         QPushButton:pressed {
             background-color: rgba(138, 138, 138, 0.4);
         }
+        QPushButton:disabled {
+            background-color: rgba(138, 138, 138, 0.1);
+        }
     """
 
     def __init__(self, text: str):

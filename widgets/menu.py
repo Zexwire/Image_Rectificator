@@ -1,3 +1,4 @@
+from PySide6.QtGui import QPixmap, Qt
 from PySide6.QtWidgets import (QWidget, QPushButton, QVBoxLayout,
                                QLabel, QFrame, QHBoxLayout, QLineEdit)
 
@@ -8,11 +9,7 @@ class Menu(QWidget):
         layout = QVBoxLayout()
 
         instructions_widget = CollapsibleSection(
-            "Instrucciones",
-            "1. Seleccione una imagen\n"
-            "2. Haga clic sobre la imagen para marcar esquinas (máx 4)\n"
-            "3. Si se equivoca, haga clic en el punto existente que desee eliminar\n"
-            "4. Cuando las 4 esquinas estén marcadas, haga click en Aceptar")
+            "Instrucciones")
 
         line = QFrame()
         line.setFrameShape(QFrame.Shape.HLine)
@@ -25,7 +22,7 @@ class Menu(QWidget):
         self.setLayout(layout)
 
 class CollapsibleSection(QWidget):
-    def __init__(self, title: str, content: str):
+    def __init__(self, title: str):
         super().__init__()
 
         self.toggle_button = QPushButton(f"▸ {title}")
@@ -49,13 +46,28 @@ class CollapsibleSection(QWidget):
         content_area.setVisible(False)
         self.content_area = content_area
 
-        content_label = QLabel(content)
+        content_label = QLabel("1. Haga clic en 'Abrir Imagen' y seleccione una imagen.\n"
+            "2. Haga clic sobre la imagen para marcar las esquinas del cuadrado o rectángulo a rectificar. *\n"
+            "3. Si se equivoca, haga clic en la esquina que desee eliminar.\n"
+            "4. Cuando las 4 esquinas estén marcadas, haga clic en 'Rectificar'.")
         content_label.setWordWrap(True)
-        content_label.setStyleSheet("padding-left: 10px;")
+        content_label.setStyleSheet("padding-left: 10px; background-color: rgba(128, 128, 128, 0.0);")
+
+        corners_instructions_label = QLabel("\n* El orden de las esquinas en la imagen rectificada será el siguiente: \n")
+        corners_instructions_label.setWordWrap(True)
+        corners_instructions_label.setStyleSheet("padding-left: 10px; background-color: rgba(128, 128, 128, 0.0);")
+        corners_instructions_image = QLabel()
+        corners_instructions_image.setPixmap(QPixmap("assets/corners-instructions.png"))
+        corners_instructions_image.setScaledContents(True)
+        corners_instructions_image.setFixedSize(300, 300)
+
 
         layout = QVBoxLayout()
         layout.addWidget(content_label)
+        layout.addWidget(corners_instructions_label)
+        layout.addWidget(corners_instructions_image, alignment=Qt.AlignmentFlag.AlignCenter)
         content_area.setLayout(layout)
+        content_area.setStyleSheet("background-color: rgba(128, 128, 128, 0.2); padding: 10px; border-radius: 10px;")
 
         # Layout principal
         main_layout = QVBoxLayout(self)
@@ -95,9 +107,13 @@ class AspectRatioWidget(QWidget):
 
         instructions = QLabel("Para calcular la razón, debe dividir ALTO / ANCHO de su figura. Por ejemplo:\n"
                               "    -   En caso de ser un cuadrado, la razón será 1.0.\n"
-                              "    -   En caso de ser un folio DinA4, la razón será 1.4142135 (en vertical) o 0.7071067 (en horizontal).")
+                              "    -   En caso de ser un folio DinA4 vertical, la razón será 1.4142135.")
         instructions.setWordWrap(True)
-        instructions.setStyleSheet("opacity: 0.1;")
+        instructions.setStyleSheet("""
+            background-color: rgba(128, 128, 128, 0.2);
+            padding: 10px;
+            border-radius: 10px;
+        """)
 
         main_layout.addLayout(ratio_input_layout)
         main_layout.addWidget(instructions)

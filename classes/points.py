@@ -10,50 +10,45 @@ class Point:
 class Coordinates:
     def __init__(self, max_points=4):
         self.max_points = max_points
-        self.points = []
+        self.points = {}  # Key=position 1-max_points, Value=Point
 
     def __iter__(self):
-        return iter(self.points)
+        # Return iterator over points in order of position
+        return iter([self.points[i] for i in sorted(self.points.keys())])
 
     def set_points(self, points):
         self.clear()
-        self.points = points
-        #self.order_points()
+        for i, point in enumerate(points):
+            self.points[i] = point
 
     def add_point(self, x, y, w):
-        if len(self.points) < self.max_points:
-            self.points.append(Point(x, y, w))
-            #self.order_points()
+        pos = self.get_next_position()
+        if pos is not None:
+            self.points[pos] = Point(x, y, w)
             return True
         return False
 
+    def get_next_position(self):
+        for i in range(0, self.max_points):
+            if i not in self.points:
+                return i
+        return None
+
     def remove_point_near(self, x, y, threshold=20):
-        """Elimina un punto cercano a las coordenadas dadas"""
-        for i, p in enumerate(self.points):
+        """Removes a point near the given coordinates"""
+        for i, p in self.points.items():
             distance = math.sqrt((p.x - x) ** 2 + (p.y - y) ** 2)
             if distance < threshold:
-                self.points.pop(i)
+                del self.points[i]
                 return True
         return False
 
-    def order_points(self):
-        # 1 ----- 2
-        # |       |
-        # |       |
-        # 3 ----- 4
-        cx = sum(p.x for p in self.points) / len(self.points)
-        cy = sum(p.y for p in self.points) / len(self.points)
-
-        self.points = sorted(self.points, key=lambda p: (
-            -1 if p.y <= cy else 1,  # Primero separar arriba/abajo
-            -p.x if p.x <= cx else p.x  # Luego izquierda/derecha
-        ))
+    def get_points(self):
+        # Return points in order by position
+        return [self.points[i] for i in sorted(self.points.keys())]
 
     def clear(self):
-        self.points = []
+        self.points = {}  # Changed from [] to {} to match the dictionary structure
 
     def is_complete(self):
-        return len(self.points) == self.max_points
-
-    def get_points(self):
-        return self.points.copy()
+        return len(self.points) == self.max_points and all(i in self.points for i in range(0, self.max_points))

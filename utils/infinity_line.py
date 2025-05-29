@@ -12,7 +12,6 @@ def calculate_vanish_points(p1: Point, p2: Point, p3: Point, p4: Point) -> list[
     q = intersection([p1, p3], [p2, p4])  # Intersección de lados opuestos 1-3 y 2-4
 
     # Verificar si alguno de los puntos es None (líneas paralelas)
-    # En caso de serlo, TODO ver que narices hay que hacer aquí lol
     if p is None or q is None:
         raise ValueError("No se pudo calcular la línea del infinito (algunas líneas son paralelas)")
 
