@@ -18,7 +18,7 @@ class Coordinates:
     def set_points(self, points):
         self.clear()
         self.points = points
-        self.order_points()
+        #self.order_points()
 
     def add_point(self, x, y, w):
         if len(self.points) < self.max_points:
