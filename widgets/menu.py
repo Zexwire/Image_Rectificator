@@ -1,12 +1,35 @@
 from PySide6.QtGui import QPixmap, Qt
 from PySide6.QtWidgets import (QWidget, QPushButton, QVBoxLayout,
                                QLabel, QFrame, QHBoxLayout, QLineEdit)
-
+from utils.dark_mode import is_dark_mode
 
 class Menu(QWidget):
     def __init__(self, aspect_ratio_widget):
         super().__init__()
         layout = QVBoxLayout()
+
+        # Cabecera con logo y título ---
+        header_widget = QWidget()
+        header_layout = QHBoxLayout()
+
+        # Logo adaptado a tema claro/oscuro
+        logo_label = QLabel()
+        logo_path = "assets/Logo_Dark.png" if is_dark_mode() else "assets/Logo_Light.png"
+        logo_pixmap = QPixmap(logo_path)
+        logo_label.setPixmap(logo_pixmap.scaled(80, 80, Qt.AspectRatioMode.KeepAspectRatio))
+
+        # Título "QuadFix"
+        title_label = QLabel("QuadFix")
+        title_label.setStyleSheet("""
+            font-size: 24pt;
+            font-weight: bold;
+            padding-left: 10px;
+        """)
+
+        header_layout.addWidget(logo_label)
+        header_layout.addWidget(title_label)
+        header_layout.addStretch()  # Para alinear a la izquierda
+        header_widget.setLayout(header_layout)
 
         instructions_widget = CollapsibleSection(
             "Instrucciones")
@@ -15,6 +38,7 @@ class Menu(QWidget):
         line.setFrameShape(QFrame.Shape.HLine)
         line.setFrameShadow(QFrame.Shadow.Raised)
 
+        layout.addWidget(header_widget)
         layout.addWidget(instructions_widget)
         layout.addWidget(line)
         layout.addWidget(aspect_ratio_widget)
@@ -51,15 +75,15 @@ class CollapsibleSection(QWidget):
             "3. Si se equivoca, haga clic en la esquina que desee eliminar.\n"
             "4. Cuando las 4 esquinas estén marcadas, haga clic en 'Rectificar'.")
         content_label.setWordWrap(True)
-        content_label.setStyleSheet("padding-left: 10px; background-color: rgba(128, 128, 128, 0.0);")
+        content_label.setStyleSheet("padding-left: 20px; background-color: rgba(128, 128, 128, 0.0);")
 
-        corners_instructions_label = QLabel("\n* El orden de las esquinas en la imagen rectificada será el siguiente: \n")
+        corners_instructions_label = QLabel("* El orden de las esquinas en la imagen rectificada será el siguiente: \n")
         corners_instructions_label.setWordWrap(True)
         corners_instructions_label.setStyleSheet("padding-left: 10px; background-color: rgba(128, 128, 128, 0.0);")
         corners_instructions_image = QLabel()
         corners_instructions_image.setPixmap(QPixmap("assets/corners-instructions.png"))
         corners_instructions_image.setScaledContents(True)
-        corners_instructions_image.setFixedSize(300, 300)
+        corners_instructions_image.setFixedSize(150, 150)
 
 
         layout = QVBoxLayout()

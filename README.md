@@ -25,8 +25,6 @@ Herramientas: OpenCV (procesamiento de imágenes) y NumPy (matrices). Tkinter y 
 
 ### Fase 4: Mejoras (ideal hacerlo)
 - Hacer una buena IU
-- Usar IA para detectar las esquinas (algo similar a notebloc scanner, que seleccione las esquinas automáticamente y se puedan editar manualmente en caso de error).
-- Mejorar el contraste: Podemos meterle filtros a la imagen resultante (pues tratándose de un folio es sencillo modificando la luz)
 - Eliminar el fondo (según lo que opine Jonatan)
 
 ### Fase 5: Presentación

@@ -38,6 +38,10 @@ class ApplicationWindow(QMainWindow):
         self.transform_button.setEnabled(False)
         self.transform_button.clicked.connect(self.transform_image)
 
+        self.download_button = PrimaryButton("Descargar Imagen")
+        self.download_button.setEnabled(False)
+        self.download_button.clicked.connect(self.save_image)
+
         self.aspect_ratio_widget = AspectRatioWidget()
         self.aspect_ratio_widget.aspect_ratio_changed.connect(self.update_transform_button)
 
@@ -46,6 +50,7 @@ class ApplicationWindow(QMainWindow):
         menu_layout.addWidget(self.open_image_button)
         menu_layout.addWidget(self.clear_points_button)
         menu_layout.addWidget(self.transform_button)
+        menu_layout.addWidget(self.download_button) 
 
         menu_container_widget.setLayout(menu_layout)
 
@@ -83,9 +88,28 @@ class ApplicationWindow(QMainWindow):
             H = calculate_homography(self.click_area.coordinates, self.click_area.width() if self.click_area.width() < self.click_area.height() else self.click_area.height(), self.click_area.aspect_ratio)
             self.click_area.image = warp_perspective_qpixmap(self.click_area.image, H, (self.click_area.width(),self.click_area.height()))
 
+            self.download_button.setEnabled(True)
+            
             self.overlay_loading_widget.show_loading(False)
             self.click_area.clear_points()
         except Exception as e:
             self.overlay_loading_widget.show_loading(False)
             tb = traceback.format_exc()
             QMessageBox.critical(self, "Error", f"Error al rectificar:\n{str(e)}\n\n{tb}")
+
+    def save_image(self):
+        if not self.click_area.image:
+            return
+
+        # Obtener la ruta para guardar la imagen
+        pictures_path = QStandardPaths.writableLocation(QStandardPaths.StandardLocation.PicturesLocation)
+        file_path, _ = QFileDialog.getSaveFileName(
+            self,
+            "Guardar imagen rectificada",
+            pictures_path + "/imagen_rectificada.png",
+            "Imágenes (*.png *.jpg *.jpeg *.bmp)"
+        )
+
+        if file_path:
+            self.click_area.image.save(file_path)
+            QMessageBox.information(self, "Éxito", "Imagen guardada correctamente")
