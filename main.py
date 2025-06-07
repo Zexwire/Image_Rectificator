@@ -21,8 +21,8 @@ if __name__ == "__main__":
     window.setWindowIcon(QIcon(icon_path))
 
 
-    # Mostrar en pantalla completa (modo ventana maximizada con barra y botones)
-    window.showMaximized()
+    # Mostrar en pantalla completa
+    window.showFullScreen()
 
     # Permitir salir con tecla ESC
     window.keyPressEvent = lambda e: app.quit() if e.key() == Qt.Key_Escape else None
