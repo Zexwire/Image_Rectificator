@@ -20,8 +20,6 @@ if __name__ == "__main__":
     window = ApplicationWindow()
     window.setWindowIcon(QIcon(icon_path))
 
-    # Configurar barra de título y botones cerrar/minimizar
-    window.setWindowFlags(Qt.Window | Qt.WindowCloseButtonHint | Qt.WindowMinimizeButtonHint)
 
     # Mostrar en pantalla completa (modo ventana maximizada con barra y botones)
     window.showMaximized()

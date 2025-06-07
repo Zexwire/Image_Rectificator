@@ -25,7 +25,7 @@ class ApplicationWindow(QMainWindow):
         menu_container_widget.setFixedWidth(500)
 
         menu_layout = QVBoxLayout()
-        menu_layout.setContentsMargins(5, 5, 5, 5)
+        menu_layout.setContentsMargins(5, 5, 5, 50)
 
         self.open_image_button = SecondaryButton("Abrir Imagen")
         self.open_image_button.clicked.connect(self.open_image)

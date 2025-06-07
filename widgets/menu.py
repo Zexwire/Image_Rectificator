@@ -83,7 +83,7 @@ class CollapsibleSection(QWidget):
         corners_instructions_image = QLabel()
         corners_instructions_image.setPixmap(QPixmap("assets/corners-instructions.png"))
         corners_instructions_image.setScaledContents(True)
-        corners_instructions_image.setFixedSize(150, 150)
+        corners_instructions_image.setFixedSize(100, 100)
 
 
         layout = QVBoxLayout()
