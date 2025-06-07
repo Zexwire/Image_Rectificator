@@ -16,7 +16,7 @@ class Menu(QWidget):
         logo_label = QLabel()
         logo_path = "assets/Logo_Dark.png" if is_dark_mode() else "assets/Logo_Light.png"
         logo_pixmap = QPixmap(logo_path)
-        logo_label.setPixmap(logo_pixmap.scaled(80, 80, Qt.AspectRatioMode.KeepAspectRatio))
+        logo_label.setPixmap(logo_pixmap.scaled(60, 60, Qt.AspectRatioMode.KeepAspectRatio))
 
         # Título "QuadFix"
         title_label = QLabel("QuadFix")

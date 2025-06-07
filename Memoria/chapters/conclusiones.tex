@@ -1,0 +1,40 @@
+% !TEX root = ../main.tex
+
+\chapter{Conclusiones}
+
+El proyecto \textit{Rectificador de Imágenes} (QuadFix) ha logrado su objetivo principal: crear una herramienta intuitiva y eficiente para rectificar imágenes que contienen rectángulos mediante transformaciones proyectivas. A lo largo del desarrollo, se implementaron algoritmos avanzados de visión por computadora y se diseñó una interfaz gráfica amigable que facilita la interacción con el usuario. Además, se incorporaron funcionalidades importantes como el ajuste dinámico de proporciones y el soporte para modos visuales claros y oscuros, lo que contribuye a mejorar tanto la adaptabilidad como la experiencia general del usuario.
+
+\section{Logros Principales}
+
+En cuanto a los resultados obtenidos, el sistema es capaz de calcular con precisión la matriz de homografía necesaria para transformar un cuadrilátero seleccionado por el usuario en una figura regular, ya sea un cuadrado o un rectángulo con una proporción definida. La detección de puntos de fuga y la aplicación de la transformación proyectiva se ejecutan correctamente incluso en imágenes que presentan perspectivas complejas, garantizando la robustez del proceso.
+
+La interfaz desarrollada facilita una interacción fluida, permitiendo al usuario seleccionar los puntos de interés, ajustar las proporciones deseadas y guardar los resultados obtenidos. Además, la inclusión de instrucciones claras y mecanismos de retroalimentación visual, como la indicación de carga durante el procesamiento, contribuyen a una experiencia de usuario más satisfactoria y comprensible.
+
+El sistema también demuestra una notable adaptabilidad, dado que soporta diversas proporciones, incluyendo valores típicos como 1.0 para cuadrados y aproximadamente \(\sqrt{2}\) para el formato DIN A4. Adicionalmente, la integración con el tema del sistema operativo permite que la aplicación se adapte automáticamente al modo claro u oscuro, proporcionando una apariencia coherente con la configuración del usuario.
+
+Finalmente, en términos de rendimiento, la aplicación presenta tiempos de procesamiento aceptables, gracias a la utilización de un método de interpolación sencillo.
+
+\section{Limitaciones Actuales}
+
+No obstante, existen algunas limitaciones en la implementación actual que deben ser consideradas. En primer lugar, la interpolación basada en el vecino más cercano, aunque simple y rápida, puede generar efectos de aliasing. En imágenes, esto suele manifestarse como bordes o líneas “dentadas” o “escalonadas” en lugar de ser suaves, lo que afecta la calidad visual del resultado final.
+
+Además, el manejo de errores aún es limitado. Si el usuario selecciona puntos en un orden incorrecto o si la geometría de los puntos es inválida, como en el caso de líneas casi paralelas, la rectificación se llevaría a cabo de forma errónea sin ofrecer indicaciones claras para corregir la selección, lo que puede dificultar el uso por parte de usuarios menos experimentados.
+
+
+\section{Mejoras Futuras}
+
+Para superar estas limitaciones y ampliar las capacidades del proyecto, se proponen diversas mejoras para futuras versiones. En términos de rendimiento, se contempla la implementación de métodos de interpolación más avanzados, como la interpolación bilineal o bicúbica, que mejorarán la calidad visual de la imagen rectificada.
+
+Desde el punto de vista funcional, se planea incorporar la detección automática de esquinas mediante algoritmos, facilitando la selección inicial de puntos por parte del usuario. Además, se contempla ofrecer herramientas para el ajuste manual post-transformación, permitiendo rotaciones y escalados finos para corregir imperfecciones.
+
+También se espera ampliar el soporte para rectificaciones de polígonos irregulares, como trapezoides, incrementando la versatilidad del sistema.
+
+En lo que respecta a la experiencia de usuario, se propone implementar mejoras que faciliten la interacción y el control sobre el proceso de rectificación. Entre estas mejoras destacan la incorporación de una funcionalidad de deshacer que permita retroceder en los pasos realizados durante la rectificación, la posibilidad de aplicar diversos filtros a las imágenes para mejorar su apariencia o destacar detalles específicos, y la integración de herramientas adicionales para ajustar manualmente aspectos como el brillo, contraste y saturación. Finalmente, se considera ampliar las opciones de exportación, incluyendo formatos profesionales como PDF o SVG.
+
+Estas mejoras tienen como objetivo ofrecer una experiencia más fluida, flexible y personalizada, adaptándose a las necesidades de cada usuario.
+
+\section{Conclusión Final}
+
+En resumen, QuadFix demuestra que es posible combinar fundamentos matemáticos sólidos, basados en geometría proyectiva, con herramientas modernas de programación y procesamiento de imágenes, para crear una aplicación utilizable en nuestro día a día. Aunque la versión actual cumple con los requisitos básicos planteados, las mejoras propuestas tienen el potencial de transformar la herramienta en un producto profesional apto para ámbitos como el diseño, la arquitectura o la fotogrametría.
+
+Además, el proyecto sirve como una base prometedora para la exploración de técnicas más avanzadas en visión por computadora, tales como el uso de redes neuronales para la rectificación automática o la integración con sistemas de realidad aumentada, abriendo nuevas vías para la innovación y aplicación en este campo.
