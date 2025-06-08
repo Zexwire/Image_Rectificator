@@ -105,7 +105,9 @@ image-rectification/
 ```
 
 ## Licencia
-[Especificar la licencia]
+
+## Licencia
+Este proyecto está licenciado bajo los términos de la Licencia MIT. Consulte el archivo [LICENSE](LICENSE) para más detalles.
 
 ## Contribuir
 Las contribuciones son bienvenidas. Por favor, asegúrese de:
