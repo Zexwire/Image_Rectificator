@@ -1,0 +1,77 @@
+\documentclass[index]{GeM-UPM}
+
+\usepackage{float}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% TITULO, AUTORES Y DIRECTORES
+%
+\title{QuadFix: \\ Rectificador de Imágenes}
+\author{Carmen Toribio, Marcos Carnerero, María Moronta}
+\genderauthor{M}
+\bibauthor {Toribio, Carmen,  Carnerero, Marcos,  Moronta, María}
+\tutor{Jonatan Sanchez}
+\bibtutor{Sanchez, Jonatan}
+\fecha{9 de junio de 2025}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% ENTORNOS MATEMÁTICOS
+%
+\newtheoremstyle{theoremGeM}% name of the style to be used
+  {\topsep}% measure of space to leave above the theorem. E.g.: 3pt
+  {\topsep}% measure of space to leave below the theorem. E.g.: 3pt
+  {\itshape}% name of font to use in the body of the theorem
+  {0pt}% measure of space to indent
+  {\bfseries\color{schoolcolor}}% name of head font
+  {.}% punctuation between head and body
+  { }% space after theorem head; " " = normal interword space
+  {\thmname{#1}\thmnumber{ #2}\textnormal{\thmnote{ (#3)}}}
+
+% Nuevos teoremas
+\theoremstyle{theoremGeM}
+\newtheorem{thm}{Teorema}[chapter]
+\newtheorem{prop}[thm]{Proposición}
+\newtheorem{lem}[thm]{Lema}
+
+% Cambiamos el color de la demostración
+\AtBeginDocument{\renewcommand*{\proofname}{\color{schoolcolor}Demostración}}
+
+\newtheoremstyle{remarkGeM}% name of the style to be used
+  {\topsep}% measure of space to leave above the theorem. E.g.: 3pt
+  {\topsep}% measure of space to leave below the theorem. E.g.: 3pt
+  {}% name of font to use in the body of the theorem
+  {0pt}% measure of space to indent
+  {\itshape\color{schoolcolor}}% name of head font
+  {.}% punctuation between head and body
+  { }% space after theorem head; " " = normal interword space
+  {\thmname{#1}\thmnumber{ #2}\textnormal{\thmnote{ (#3)}}}
+
+\theoremstyle{remarkGeM}
+\newtheorem*{rmk}{Observación}
+\newtheorem{exm}[thm]{Ejemplo}
+
+\newtheoremstyle{definitionGeM}% name of the style to be used
+  {\topsep}% measure of space to leave above the theorem. E.g.: 3pt
+  {\topsep}% measure of space to leave below the theorem. E.g.: 3pt
+  {}% name of font to use in the body of the theorem
+  {0pt}% measure of space to indent
+  {\bfseries\color{schoolcolor}}% name of head font
+  {.}% punctuation between head and body
+  { }% space after theorem head; " " = normal interword space
+  {\thmname{#1}\thmnumber{ #2}\textnormal{\thmnote{ (#3)}}}
+\theoremstyle{definitionGeM}
+\newtheorem{defn}[thm]{Definition}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% DOCUMENTO
+%
+
+\begin{document}
+
+\input{chapters/introduction}
+\input{chapters/fundamentos}
+\input{chapters/desarrollo}
+\input{chapters/ejemplos}
+\input{chapters/conclusiones}
+
+\end{document}
