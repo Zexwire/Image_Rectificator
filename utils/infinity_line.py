@@ -1,5 +1,5 @@
 from classes.points import Point
-import numpy as np
+
 
 def calculate_vanish_points(p1: Point, p2: Point, p3: Point, p4: Point) -> list[Point]:
     """

@@ -1,5 +1,6 @@
-from PySide6.QtCore import QStandardPaths
+import traceback
 
+from PySide6.QtCore import QStandardPaths
 from PySide6.QtWidgets import (QWidget, QVBoxLayout,
                                QMessageBox, QFileDialog, QHBoxLayout, QMainWindow)
 
@@ -8,7 +9,6 @@ from widgets.buttons import PrimaryButton, SecondaryButton
 from widgets.click_area import ClickArea, OverlayWidget
 from widgets.menu import Menu, AspectRatioWidget
 
-import traceback
 
 class ApplicationWindow(QMainWindow):
     ASPECT_RATIO = 0.0

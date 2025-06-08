@@ -1,7 +1,9 @@
 from PySide6.QtGui import QPixmap, Qt
 from PySide6.QtWidgets import (QWidget, QPushButton, QVBoxLayout,
                                QLabel, QFrame, QHBoxLayout, QLineEdit)
+
 from utils.dark_mode import is_dark_mode
+
 
 class Menu(QWidget):
     def __init__(self, aspect_ratio_widget):

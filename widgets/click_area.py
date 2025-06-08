@@ -1,5 +1,5 @@
 from PySide6.QtCore import Qt, Signal
-from PySide6.QtGui import (QPainter, QPen, QMouseEvent, QPixmap, QMovie)
+from PySide6.QtGui import (QPainter, QPen, QMouseEvent, QPixmap)
 from PySide6.QtWidgets import QWidget, QLabel, QVBoxLayout, QApplication
 
 from classes.points import Coordinates

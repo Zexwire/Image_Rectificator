@@ -1,10 +1,11 @@
 import sys
-from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QApplication
-from widgets.application import ApplicationWindow
-from PySide6.QtGui import QIcon
-from utils.dark_mode import is_dark_mode
 
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QIcon
+from PySide6.QtWidgets import QApplication
+
+from utils.dark_mode import is_dark_mode
+from widgets.application import ApplicationWindow
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

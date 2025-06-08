@@ -1,10 +1,10 @@
+from PySide6.QtGui import (QImage, QPixmap)
 from numpy import (array, zeros, uint8, frombuffer)
 from numpy.linalg import (inv, solve)
 
-from PySide6.QtGui import (QImage, QPixmap)
-
-from classes.points import (Coordinates, Point)
+from classes.points import (Coordinates)
 from utils.infinity_line import calculate_vanish_points
+
 
 def calculate_homography(sqr_points: Coordinates, output_sqr, aspect_ratio: float):
     """

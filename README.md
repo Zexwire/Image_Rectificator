@@ -19,11 +19,8 @@ QuadFix es una herramienta avanzada de procesamiento de imágenes desarrollada e
 - Sistema operativo: Linux, Windows, macOS
 
 ### Dependencias principales
-- `opencv-python`
 - `numpy`
 - `PySide6`
-- `pillow`
-- `matplotlib`
 
 ## Instalación
 
