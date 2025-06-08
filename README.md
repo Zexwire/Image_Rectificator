@@ -1,32 +1,121 @@
-# Image-Rectification
-This is a basic project using Affine and Projective Geometry. It rectifies images containing squares or rectangles.
+# QuadFix - Rectificador de imágenes con geometría proyectiva
 
-----------------------
-## Tareas:
+## Descripción
+QuadFix es una herramienta avanzada de procesamiento de imágenes desarrollada en Python que permite rectificar imágenes utilizando principios de geometría proyectiva. La aplicación está diseñada específicamente para corregir la distorsión en imágenes tomadas desde ángulos no frontales, transformándolas en vistas frontales precisas con las proporciones correctas.
 
-### Fase 1: Solo cuadrados (5 de mayo)
-Herramientas: OpenCV (procesamiento de imágenes) y NumPy (matrices). Tkinter y PySide6 (IU)
+![Logo QuadFix](assets/Logo_Dark.png)
 
-- (M - 23/04) Crear una ventana + Crear función que debe recibir como input 4 clicks del usuario en la ventana, y como output las coordenadas relativas de dichos clicks en la ventana. Lo ideal sería que el usuario haga 4 clicks y se active un botón tipo "Aceptar" para que el input se pase a la función.
-- (C - 28/04) Función que dadas 4 coordenadas calcule las coordenadas de dos puntos de la recta del infinito
-- (C - 28/04) Crear clase coordenada, que tenga como primer punto 0 o 1. 
-- (M - 02/05) Función que dada una base y unos puntos transforme los puntos a referencia estándar
-- (M - 02/05) Función que halle la referencia proyectiva y calcular la aplicación con la base asociada. Utilizar la función Raw Reduce para triangular. (Ajustar los números entre los puntos que se quieren transformar)
-- (M - 05/05) Función que muestre el resultado final con la rectificación de la imagen dados los puntos iniciales y finales. Transformación dadas unas coordenadas iniciales y unas coordenadas finales.
-- (05/05 a poder ser) Reunión con Jonatan (consultar si eliminar el fondo de la imagen o no)
+## Características principales
+- Interfaz gráfica intuitiva desarrollada con PySide6
+- Corrección de perspectiva basada en geometría proyectiva
+- Soporte para diferentes proporciones de aspecto (cuadrados, DIN A4, etc.)
+- Detección automática de puntos de fuga
+- Interpolación por vecino más cercano para la transformación de imagen
+- Modo claro/oscuro integrado
+- Visualización en tiempo real de los puntos de control
 
-### Fase 2: Ampliarlo a folios (razón sqrt(2)) (18 de mayo)
-- Paso previo a usar la función cuadrado: hallar las esquinas del cuadrado dentro del rectángulo del folio usando la razón sqrt(2). Con esas nuevas coordenadas, pasárselas a la función cuadrado y el resto es todo igual (creo). --> HACER FUNCIÓN RAZÓN
+## Requisitos del sistema
+- Python 3.12.3 o superior
+- Sistema operativo: Linux, Windows, macOS
 
-### Fase 3: Documentación y elementos matemáticos
-- Hablar de la preservación de la métrica
-- Dar la justificación, con dibujos a ser posible
-- Ejemplos de uso
+### Dependencias principales
+- `opencv-python`
+- `numpy`
+- `PySide6`
+- `pillow`
+- `matplotlib`
 
-### Fase 4: Mejoras (ideal hacerlo)
-- Hacer una buena IU
-- Eliminar el fondo (según lo que opine Jonatan)
+## Instalación
 
-### Fase 5: Presentación
-- Powerpoint mono que explique un poco por encima que es lo que hemos hecho
-- Demo de uso (interesante que se pueda abrir rápido)
+1. Clonar el repositorio:
+```bash
+git clone [URL_del_repositorio]
+```
+2. Crear y activar un entorno virtual:
+
+**En Linux/Mac:**
+```bash
+python -m venv venv 
+source venv/bin/activate
+```
+**En Windows:**
+```bash
+python -m venv venv
+venv\Scripts\activate
+```
+
+3. Instalar las dependencias:
+```bash
+pip install -r requirements.txt
+```
+
+
+## Uso
+
+1. Ejecutar la aplicación:
+```bash
+python main.py
+```
+
+2. Funcionamiento básico:
+   - Haga clic en "Abrir Imagen" para seleccionar una imagen
+   - Marque las 4 esquinas del objeto a rectificar en el siguiente orden:
+     ```
+     1 --- 2
+     |     |
+     3 --- 4
+     ```
+   - Introduzca la razón de aspecto (altura/ancho) de su figura:
+     - Para un cuadrado: 1.0
+     - Para un folio DIN A4 vertical: 1.4142135
+   - Haga clic en "Rectificar" para procesar la imagen
+
+![Ejemplo Interfaz 1](Memoria/Modelización/figures/4.Examples/Cuadrado/Vinilo1.png)
+![Ejemplo Interfaz 2](Memoria/Modelización/figures/4.Examples/Cuadrado/Vinilo2.png)
+
+
+### Consejos de uso
+- Si se equivoca al marcar un punto, puede hacer clic sobre él para eliminarlo
+- La aplicación detectará automáticamente los puntos de fuga para una rectificación precisa
+- Para mejores resultados, asegúrese de que el objeto a rectificar esté completamente visible en la imagen
+
+## Fundamentos técnicos
+
+QuadFix utiliza conceptos avanzados de geometría proyectiva para realizar la rectificación. Para una introducción más teórica, recomendamos leer la `Memoria.pdf`. Como resumen superficial, es necesario conocer:
+
+1. **Homografías**: Transformaciones que preservan la linealidad y permiten corregir la perspectiva
+2. **Puntos de fuga**: Utilizados para determinar la orientación original del objeto
+3. **Preservación métrica**: Asegura que las proporciones del objeto se mantienen en la imagen rectificada
+
+## Estructura del proyecto
+```
+image-rectification/
+├── assets/                     # Recursos gráficos (logo, iconos, etc.)
+├── classes/                    # Clases principales (modelo de puntos, coordenadas, etc.)
+├── utils/                      # Módulos de utilidad
+│   ├── dark_mode.py            # Gestión de modo claro/oscuro
+│   ├── infinity_line.py        # Cálculo de puntos de fuga y líneas al infinito
+│   └── projective_transform.py # Aplicación de homografía y transformaciones
+├── widgets/                    # Componentes de la interfaz gráfica
+│   ├── application.py          # Inicialización principal de la aplicación
+│   ├── buttons.py              # Botones personalizados
+│   ├── click_area.py           # Zona donde se marcan los puntos
+│   └── menu.py                 # Menú superior y opciones
+└── main.py                     # Punto de entrada de la aplicación
+```
+
+## Licencia
+[Especificar la licencia]
+
+## Contribuir
+Las contribuciones son bienvenidas. Por favor, asegúrese de:
+1. Hacer fork del repositorio
+2. Crear una rama para su feature (`git checkout -b feature/AmazingFeature`)
+3. Commit sus cambios (`git commit -m 'Add some AmazingFeature'`)
+4. Push a la rama (`git push origin feature/AmazingFeature`)
+5. Abrir un Pull Request
+
+## Autores
+**Autores**:  
+Carmen Toribio Pérez, Marcos Carnerero Blanco y María Moronta Carrión  
+**Dirección del proyecto**: Jonatan Sánchez Hernández

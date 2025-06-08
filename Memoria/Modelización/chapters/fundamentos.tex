@@ -56,7 +56,7 @@ En resumen, la rectificación proyectiva es una herramienta matemática y comput
 
 Como se mencionó anteriormente, la herramienta fundamental para la rectificación de imágenes es la \textbf{homografía}, una transformación proyectiva que proviene de la \textbf{geometría proyectiva}. Esta rama de las matemáticas estudia las propiedades de las figuras que permanecen invariantes bajo transformaciones proyectivas, como las perspectivas que vemos en fotografías.
 
-A diferencia de la geometría euclidiana —que conserva distancias, ángulos y paralelismo—, la geometría proyectiva preserva propiedades más generales, como la \textbf{incidencia} (puntos alineados sobre una misma recta), la \textbf{colinealidad} y la \textbf{razón doble} (una proporción invariante entre cuatro puntos colineales bajo transformaciones proyectivas).
+A diferencia de la geometría euclidiana —que conserva distancias, ángulos y paralelismo—, la geometría proyectiva preserva propiedades más generales, como la \textbf{incidencia} (por ejemplo, que un punto pertenezca a una recta), la \textbf{colinealidad} (que varios puntos estén alineados) y la \textbf{razón doble} (una proporción invariante entre cuatro puntos colineales bajo transformaciones proyectivas).
 
 En este contexto, una \textbf{homografía} es una función que relaciona dos planos proyectivos mediante una matriz \(3 \times 3\). Esta matriz actúa sobre puntos expresados en coordenadas homogéneas, lo que permite manejar de forma compacta transformaciones que incluyen proyecciones y efectos de perspectiva.
 
@@ -86,7 +86,7 @@ Esta transformación tiene la propiedad fundamental de preservar la \textbf{line
 En nuestro sistema, la matriz de homografía \(H\) se calcula directamente a partir de información geométrica obtenida de la imagen, mediante un proceso basado en álgebra lineal. El procedimiento consta de los siguientes pasos principales:
 
 \begin{enumerate}
-    \item \textbf{Selección de puntos de entrada:} El usuario proporciona cuatro puntos no colineales que definen el contorno del objeto plano a rectificar (por ejemplo, los vértices de un folio o cartel en una imagen tomada en perspectiva).
+    \item \textbf{Selección de puntos de entrada:} El usuario proporciona cuatro puntos que forman un cuadrilátero, es decir, dos pares de puntos colineales que definen los lados opuestos del objeto plano a rectificar (por ejemplo, los vértices de un folio o cartel en una imagen tomada en perspectiva).
 
     \item \textbf{Cálculo de puntos de fuga:} Se construyen las rectas que corresponden a los lados opuestos del cuadrilátero, y se obtienen sus intersecciones en coordenadas homogéneas. Estas intersecciones definen los \textit{puntos de fuga} \(\mathbf{v}_1\) y \(\mathbf{v}_2\), que caracterizan la dirección de las líneas paralelas en el espacio original:
     \[

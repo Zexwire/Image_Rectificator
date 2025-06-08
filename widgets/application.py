@@ -75,6 +75,7 @@ class ApplicationWindow(QMainWindow):
         if file_dialog.exec():
             image_path = file_dialog.selectedFiles()[0]
             self.click_area.load_image(image_path)
+            self.download_button.setEnabled(False)
     def update_transform_button(self):
         self.ASPECT_RATIO = self.aspect_ratio_widget.get_aspect_ratio()
         self.click_area.set_aspect_ratio(self.ASPECT_RATIO)
